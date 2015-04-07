@@ -1,0 +1,110 @@
+/**
+ * This file is part of the Wikidata periodic table © 2012-2015 by Ricordisamoa.
+ *
+ * The Wikidata periodic table is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * The Wikidata periodic table is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with the Wikidata periodic table.  If not, see <http://www.gnu.org/licenses/>.
+ */
+table#period {
+	border-spacing: 0;
+}
+table#period td {
+	width: 5.2em;
+	height: 5.4em;
+	padding: 0;
+	display: inline-block;
+	font-size: 85%;
+	text-align: center;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	border: 1px white solid;
+	background: lemonchiffon;
+}
+table#period td.empty,
+table#period td.indicator {
+	background: none;
+}
+table#period td.indicator > span:first-child {
+	font-size: 150%;
+}
+table#period td > span:first-child {
+	font-size: 1.7em;
+}
+
+/**
+ * COLORS!
+ * taken from https://en.wikipedia.org/wiki/Periodic_table#Periodic_table_legend_for_category
+ */
+
+/* unknown */
+table#period .element {
+	background: #e8e8e8;
+}
+
+/* alkali metals */
+table#period .element.group-1 {
+	background: #f66;
+}
+
+/* alkaline earth metals */
+table#period .element.group-2 {
+	background: #ffdead;
+}
+
+/* d-block metals */
+table#period .element.group-3,
+table#period .element.group-4,
+table#period .element.group-5,
+table#period .element.group-6,
+table#period .element.group-7,
+table#period .element.group-8,
+table#period .element.group-9,
+table#period .element.group-10,
+table#period .element.group-11,
+table#period .element.group-12 {
+	background: #ffc0c0;
+}
+
+/* post-transition metals */
+table#period .element.post-transition-metal {
+	background: #ccc;
+}
+
+/* metalloids */
+table#period .element.metalloid {
+	background: #cc9;
+}
+
+/* diatomic nonmetals */
+table#period .element.diatomic-nonmetal {
+	background: #e7ff8f;
+}
+
+/* polyatomic nonmetals */
+table#period .element.polyatomic-nonmetal {
+	background: #a1ffc3;
+}
+
+/* noble gases */
+table#period .element.group-18 {
+	background: #c0ffff;
+}
+
+/* lanthanides */
+table#period .element.special-6 {
+	background: #ffbfff;
+}
+
+/* actinides */
+table#period .element.special-7 {
+	background: #f9c;
+}

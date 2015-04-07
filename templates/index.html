@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{%- macro wd_url(element) -%}
+	//www.wikidata.org/wiki/{{ element.item_id }}
+{%- endmacro -%}
+{%- macro format_cell(cell) -%}
+	{%- if isinstance(cell, EmptyCell) -%}
+		<td class="empty"></td>
+	{%- elif isinstance(cell, UnknownCell) -%}
+		<td class="unknown"><span>?</span></td>
+	{%- elif isinstance(cell, ElementCell) -%}
+		<td class="element{%- if cell.group %} group-{{ cell.group }}{% endif %}{%- if cell.special %} special-{{ cell.special }}{% endif %}{% for class in cell.classes %} {{ class }}{% endfor %}">
+			<span>{{ cell.symbol }}</span><br/>
+			<a href="{{ wd_url(cell) }}">{{ cell.label }}</a><br/>
+			{{ cell.number }}
+		</td>
+	{%- elif isinstance(cell, IndicatorCell) -%}
+		<td class="indicator indicator-{{ cell.index }}">
+			<span>{{ ('&#65290;' * cell.index) | safe }}</span>
+		</td>
+	{%- else -%}
+		<td></td>
+	{%- endif -%}
+{%- endmacro -%}
+{% block head -%}
+<link rel="stylesheet" type="text/css" href="static/table.css">
+{% endblock %}
+{% block title %}
+Wikidata periodic table - Wikimedia Tool Labs
+{% endblock %}
+{% block content %}
+<h1>Wikidata periodic table<small>&nbsp;&middot;&nbsp;<a href="api">API</a>&nbsp;&middot;&nbsp;<a href="license">license</a></small></h1>
+{% if incomplete %}
+	<h2>Incomplete</h2>
+	<table>
+		<thead>
+			<tr>
+				<th>element</th>
+				<th>symbol</th>
+				<th>number</th>
+				<th>period</th>
+				<th>group</th>
+				<th>special</th>
+			</tr>
+		</thead>
+		<tbody>
+		{%- for element in incomplete -%}
+			<tr>
+				<td><a href="{{ wd_url(element) }}">{{ element.label }} ({{ element.item_id }})</a></td>
+				<td>{{ element.symbol or '?' }}</td>
+				<td>{{ element.number or '?' }}</td>
+				<td>{{ element.period or '?' }}</td>
+				<td>{{ element.group or '?' }}</td>
+				<td>{{ element.special or '?' }}</td>
+			</tr>
+		{%- endfor -%}
+		</tbody>
+	</ul>
+{% endif %}
+<table id="period">
+	{%- for p, row in table.items() -%}
+		<tr>
+			{%- for g, cell in row.items() -%}
+				{{ format_cell(cell) }}
+			{%- endfor -%}
+		</tr>
+	{%- endfor -%}
+	{%- for p, row in special_series.items() -%}
+		<tr>
+			{%- for cell in row -%}
+				{{ format_cell(cell) }}
+			{%- endfor -%}
+		</tr>
+	{%- endfor -%}
+</table>
+{% endblock %}

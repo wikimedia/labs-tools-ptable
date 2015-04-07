@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}
+Wikidata periodic table: API - Wikimedia Tool Labs
+{% endblock %}
+{% block content %}
+<h1>Wikidata periodic table</h1>
+
+<h2 id="api">API</h2>
+<p>
+The Wikidata periodic table exposes a free API.<br>
+Just pass one or more <code>props</code> arguments to this URL,
+and it will return the requested data in JSON format.
+</p>
+<p>
+The only available <code>props</code> so far are
+<kbd>elements</kbd> and <kbd>incomplete</kbd>.
+</p>
+<p>
+<a href="?props=elements&props=incomplete">Example</a>.
+</p>
+{% endblock %}
+</html>
