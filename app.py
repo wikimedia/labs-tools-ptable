@@ -24,7 +24,7 @@ import chemistry
 
 class CustomJSONEncoder(JSONEncoder):
     def default(self, obj):
-        if isinstance(obj, chemistry.TableCell):
+        if isinstance(obj, (chemistry.Element, chemistry.TableCell)):
             return obj.__dict__
         return super(CustomJSONEncoder, self).default(obj)
 
