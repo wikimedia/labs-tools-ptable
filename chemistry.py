@@ -18,62 +18,15 @@ You should have received a copy of the GNU General Public License
 along with the Wikidata periodic table.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-import json
 import operator
-from urllib.parse import urlencode
-from urllib.request import urlopen
 from collections import defaultdict
 
-from cachetools import ttl_cache
-
 import data
+from base import BaseProvider, WdqBase, get_json
 
 
-@ttl_cache(maxsize=20, ttl=21600)
-def get_json_cached(url, data):
-    """The information is cached for 6 hours."""
-    with urlopen(url, data.encode('utf-8')) as response:
-        raw = response.read()
-    return json.loads(raw.decode('utf-8'))
-
-
-def get_json(url, data):
-    return get_json_cached(url, urlencode(data))
-
-
-class ElementProvider(object):
+class ElementProvider(BaseProvider):
     """Base class for element providers."""
-
-    WD_API = 'http://www.wikidata.org/w/api.php'
-    API_LIMIT = 50
-    WDQ_API = 'http://wdq.wmflabs.org/api'
-
-    def __init__(self, language):
-        self.language = language
-
-    @classmethod
-    def get_available_languages(cls):
-        query = dict(action='query', format='json', meta='siteinfo', siprop='languages')
-        result = get_json(cls.WD_API, query).get('query', {}).get('languages', [])
-        return [lang['code'] for lang in result]
-
-    @classmethod
-    def get_entities(cls, ids, **kwargs):
-        entities = {}
-        query = dict(action='wbgetentities', format='json', **kwargs)
-        for index in range(0, len(ids), cls.API_LIMIT):
-            query['ids'] = '|'.join(ids[index:index + cls.API_LIMIT])
-            new_entities = get_json(cls.WD_API, query).get('entities', {})
-            entities.update(new_entities)
-        return entities
-
-    def iter_good(self):
-        iterator = iter(self)
-        while True:
-            try:
-                yield next(iterator)
-            except StopIteration:
-                raise
 
     def get_table(self):
         table = {}
@@ -131,7 +84,7 @@ class ElementProvider(object):
         return elements, table, special_series, incomplete
 
 
-class WdqElementProvider(ElementProvider):
+class WdqElementProvider(WdqBase, ElementProvider):
     """Load elements from Wikidata Query."""
     def __iter__(self):
         wdq = self.get_wdq()
@@ -171,14 +124,13 @@ class WdqElementProvider(ElementProvider):
             yield element
 
     @classmethod
-    def get_wdq(cls):
+    def get_query(cls):
         pids = [str(getattr(Element, name))
                 for name in ('symbol_pid', 'subclass_pid', 'number_pid')]
-        query = {
+        return {
             'q': 'claim[%d]' % Element.symbol_pid,
             'props': ','.join(pids)
         }
-        return get_json(cls.WDQ_API, query)
 
 
 class ApiElementProvider(ElementProvider):

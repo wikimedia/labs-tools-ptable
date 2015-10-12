@@ -1,0 +1,171 @@
+/**
+ * Copyright © 2015 ArthurPSmith
+ *
+ * This file is part of the Wikidata periodic table.
+ *
+ * The Wikidata periodic table is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * The Wikidata periodic table is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with the Wikidata periodic table.  If not, see <http://www.gnu.org/licenses/>.
+ */
+table#nuclides{
+	border-spacing: 0;
+}
+table#nuclides td {
+	width: 5px;
+	height: 5px;
+	padding: 0;
+	font-size: 5px;
+	text-align: center;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	border: 0px;
+}
+
+td.empty {
+	background: none;
+}
+
+td.nuclide{
+	background: #e8e8e8;
+}
+
+td.nuclide.stable {
+	background: #000;
+}
+
+td.nuclide.hl1e9 {
+	background: #008;
+}
+
+td.nuclide.hl1e6 {
+	background: #00c;
+}
+
+td.nuclide.hl1e3 {
+	background: #00f;
+}
+
+td.nuclide.hl1e2 {
+	background: #04c;
+}
+
+td.nuclide.hl1e1 {
+	background: #088;
+}
+
+td.nuclide.hl1e0 {
+	background: #0c4;
+}
+
+td.nuclide.hl1e-1 {
+	background: #0f0;
+}
+
+td.nuclide.hl1e-2 {
+	background: #4c4;
+}
+
+td.nuclide.hl1e-3 {
+	background: #8f8;
+}
+
+td.nuclide.hl1e-6 {
+	background: #cf6;
+}
+
+td.nuclide.hl1e-9 {
+	background: #ff0;
+}
+
+td.nuclide.hl1e-12 {
+	background: #f93;
+}
+
+td.nuclide.hl1e-15 {
+	background: #c60;
+}
+
+td.nuclide.hl1e-18 {
+	background: #f60;
+}
+
+td.nuclide.hl1e-21 {
+	background: #f00;
+}
+
+table#nuclides td.x_axis {
+	font-size: 5px;
+	transform: rotate(90.0deg);
+}
+table#nuclides td.y_axis {
+	font-size: 5px;
+}
+
+td.nuclide.beta-minus {
+	background: #0ac;
+}
+
+td.nuclide.double-beta {
+	background: #00c;
+}
+
+td.nuclide.neutron-emission {
+	background: #00f;
+}
+
+td.nuclide.2-neutron-emission{
+	background: #04c;
+}
+
+td.nuclide.3-neutron-emission {
+	background: #088;
+}
+
+td.nuclide.4-neutron-emission {
+	background: #0c4;
+}
+
+td.nuclide.positron-emission {
+	background: #0f0;
+}
+
+td.nuclide.electron-capture {
+	background: #4c4;
+}
+
+td.nuclide.double-electron-capture {
+	background: #8f8;
+}
+
+td.nuclide.proton-emission {
+	background: #cf6;
+}
+
+td.nuclide.2-proton-emission {
+	background: #ff0;
+}
+
+td.nuclide.3-proton-emission {
+	background: #f93;
+}
+
+td.nuclide.alpha-decay {
+	background: #c60;
+}
+
+td.nuclide.double-alpha-decay {
+	background: #f60;
+}
+
+td.nuclide.spontaneous-fission {
+	background: #f00;
+}
