@@ -18,8 +18,8 @@ along with the Wikidata periodic table.  If not, see <http://www.gnu.org/license
 
 import json
 import operator
-from urllib import urlencode
-from urllib2 import urlopen
+from urllib.parse import urlencode
+from urllib.request import urlopen
 from collections import defaultdict
 
 try:
@@ -34,7 +34,9 @@ import data
 @ttl_cache(maxsize=20, ttl=21600)
 def get_json_cached(url, data):
     """The information is cached for 6 hours."""
-    return json.load(urlopen(url, data))
+    with urlopen(url, data.encode('utf-8')) as response:
+        raw = response.read()
+    return json.loads(raw.decode('utf-8'))
 
 
 def get_json(url, data):
@@ -146,7 +148,7 @@ class WdqElementProvider(ElementProvider):
                 continue
             value = value.split('|')
             if len(value) == 4:
-                value = map(float, value)
+                value = list(map(float, value))
                 if len(set(value[:3])) == 1 and value[3] == 1 and value[0] == int(value[0]):
                     elements[item_id].number = int(value[0])
         for item_id, datatype, value in wdq['props'][str(Element.symbol_pid)]:
@@ -166,7 +168,7 @@ class WdqElementProvider(ElementProvider):
             label = None
             entity = entities.get(element.item_id)
             if entity and 'labels' in entity and len(entity['labels']) == 1:
-                label = entity['labels'].values()[0]['value']
+                label = list(entity['labels'].values())[0]['value']
             element.label = label
             yield element
 
