@@ -24,15 +24,11 @@ from urllib.parse import urlencode
 from urllib.request import urlopen
 from collections import defaultdict
 
-try:
-    from functools import ttl_cache
-except ImportError:
-    from cachetools import ttl_cache
+from cachetools import ttl_cache
 
 import data
 
 
-# cachetools does not support maxsize=None
 @ttl_cache(maxsize=20, ttl=21600)
 def get_json_cached(url, data):
     """The information is cached for 6 hours."""
