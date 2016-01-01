@@ -212,7 +212,7 @@ class ApiElementProvider(ElementProvider):
         except IndexError:
             symbol = None
         if 'labels' in entity and len(entity['labels']) == 1:
-            label = entity['labels'].values()[0]['value']
+            label = list(entity['labels'].values())[0]['value']
         else:
             label = None
         element = Element(number=number, symbol=symbol, item_id=entity['id'], label=label)
