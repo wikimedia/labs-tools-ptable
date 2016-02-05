@@ -73,6 +73,6 @@ Wikidata periodic table - Wikimedia Tool Labs
 	{%- endfor -%}
 </table>
 
-<a href="/nuclides">Nuclides colored by half-life</a> /
-<a href="/nuclide_decays">Nuclides colored by decays</a>
+<a href="{{ url_for('nuclides') }}">Nuclides colored by half-life</a> /
+<a href="{{ url_for('nuclide_decays') }}">Nuclides colored by decays</a>
 {% endblock %}

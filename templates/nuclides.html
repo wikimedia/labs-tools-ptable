@@ -12,7 +12,7 @@
 	{%- endif -%}
 {%- endmacro -%}
 {% block head -%}
-<link rel="stylesheet" type="text/css" href="static/nuclides.css">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='nuclides.css') }}">
 {% endblock %}
 {% block title %}
 Wikidata chart of the nuclides - Wikimedia Tool Labs
@@ -90,6 +90,6 @@ Wikidata chart of the nuclides - Wikimedia Tool Labs
 </table>
 
 <hr>
-<a href="/nuclide_decays">Nuclides by dominant decay mode</a> /
-<a href="/">Periodic Table</a>
+<a href="{{ url_for('nuclide_decays') }}">Nuclides by dominant decay mode</a> /
+<a href="{{ url_for('index') }}">Periodic Table</a>
 {% endblock %}
