@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{%- macro wd_url(nuclide) -%}
+	//www.wikidata.org/wiki/{{ nuclide.item_id }}
+{%- endmacro -%}
+{%- macro format_cell(cell) -%}
+	{%- if isinstance(cell, NoneCell) -%}
+		<td class="empty"></td>
+	{%- elif isinstance(cell, NuclideCell) -%}
+		<td title="{{ cell.label }}" class="nuclide {% for class in cell.classes %} {{ class }}{% endfor %}"> <a href="{{ wd_url(cell) }}">&nbsp;</a> </td>
+	{%- else -%}
+		<td></td>
+	{%- endif -%}
+{%- endmacro -%}
+{% block head -%}
+<link rel="stylesheet" type="text/css" href="static/nuclides.css">
+{% endblock %}
+{% block title %}
+Wikidata chart of the nuclides - Wikimedia Tool Labs
+{% endblock %}
+{% block content %}
+<h1>Wikidata chart of the nuclides</h1>
+<h2> by decay mode (stable nuclides are black)</h2>
+{% if incomplete %}
+	<h2>Incomplete</h2>
+	<table>
+		<thead>
+			<tr>
+				<th>nuclide</th>
+				<th>atomic number</th>
+				<th>neutron number</th>
+			</tr>
+		</thead>
+		<tbody>
+		{%- for nuclide in incomplete -%}
+			<tr>
+				<td><a href="{{ wd_url(nuclide) }}">{{ nuclide.label }} ({{ nuclide.item_id }})</a></td>
+				<td>{{ nuclide.atomic_number or '?' }}</td>
+				<td>{{ nuclide.neutron_number or '?' }}</td>
+			</tr>
+		{%- endfor -%}
+		</tbody>
+	</ul>
+{% endif %}
+<table id="nuclides">
+	<tr><td>Proton number</td></tr>
+	{%- for anum in sorted(table.keys(),reverse=True) -%}
+		<tr>
+			<td class="y_axis">
+				{%- if anum % 5 == 0 -%}
+					{{ anum }}
+				{%- endif %}
+			</td>
+			{%- for nnum in sorted(table[anum].keys()) -%}
+				{{ format_cell(table[anum][nnum]) }}
+			{%- endfor -%}
+		</tr>
+	{%- endfor -%}
+	<tr>
+		<td> </td>
+		{%- for nnum in sorted(table[0].keys()) -%}
+			<td class="x_axis">
+				{%- if nnum % 5 == 0 -%}
+					{{ nnum }}
+				{%- endif %}
+			</td>
+		{%- endfor -%}
+	</tr>
+	<tr><td colspan="100" align="center">Neutron number</td></tr>
+</table>
+
+<hr>
+<b>Decay types:</b>
+<table>
+  <tr><td class="nuclide beta-minus" style="width: 20px; height: 20px;"></td><td> beta-minus decay</td></tr>
+  <tr><td class="nuclide neutron-emission" style="width: 20px; height: 20px;"></td><td> neutron emission</td></tr>
+  <tr><td class="nuclide positron-emission" style="width: 20px; height: 20px;"></td><td> positron emission</td></tr>
+  <tr><td class="nuclide electron-capture" style="width: 20px; height: 20px;"></td><td> electron capture</td></tr>
+  <tr><td class="nuclide proton-emission" style="width: 20px; height: 20px;"></td><td> proton emission</td></tr>
+  <tr><td class="nuclide alpha-decay" style="width: 20px; height: 20px;"></td><td> alpha decay</td></tr>
+  <tr><td class="nuclide spontaneous-fission" style="width: 5px; height: 5px;"></td><td> spontaneous fission</td></tr>
+</table>
+
+<hr>
+
+<a href="/nuclides">Nuclides by half-life</a> /
+<a href="/">Periodic Table</a>
+{% endblock %}

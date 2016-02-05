@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{%- macro wd_url(nuclide) -%}
+	//www.wikidata.org/wiki/{{ nuclide.item_id }}
+{%- endmacro -%}
+{%- macro format_cell(cell) -%}
+	{%- if isinstance(cell, NoneCell) -%}
+		<td class="empty"></td>
+	{%- elif isinstance(cell, NuclideCell) -%}
+		<td title="{{ cell.label }}" class="nuclide {% for class in cell.classes %} {{ class }}{% endfor %}"> <a href="{{ wd_url(cell) }}">&nbsp;</a> </td>
+	{%- else -%}
+		<td></td>
+	{%- endif -%}
+{%- endmacro -%}
+{% block head -%}
+<link rel="stylesheet" type="text/css" href="static/nuclides.css">
+{% endblock %}
+{% block title %}
+Wikidata chart of the nuclides - Wikimedia Tool Labs
+{% endblock %}
+{% block content %}
+<h1>Wikidata chart of the nuclides</h1>
+<h2> By half-life (stable nuclides are black)</h2>
+{% if incomplete %}
+	<h2>Incomplete</h2>
+	<table>
+		<thead>
+			<tr>
+				<th>nuclide</th>
+				<th>atomic number</th>
+				<th>neutron number</th>
+			</tr>
+		</thead>
+		<tbody>
+		{%- for nuclide in incomplete -%}
+			<tr>
+				<td><a href="{{ wd_url(nuclide) }}">{{ nuclide.label }} ({{ nuclide.item_id }})</a></td>
+				<td>{{ nuclide.atomic_number or '?' }}</td>
+				<td>{{ nuclide.neutron_number or '?' }}</td>
+			</tr>
+		{%- endfor -%}
+		</tbody>
+	</ul>
+{% endif %}
+<table id="nuclides">
+	<tr><td>Proton number</td></tr>
+	{%- for anum in sorted(table.keys(),reverse=True) -%}
+		<tr>
+			<td class="y_axis">
+				{%- if anum % 5 == 0 -%}
+					{{ anum }}
+				{%- endif %}
+			</td>
+			{%- for nnum in sorted(table[anum].keys()) -%}
+				{{ format_cell(table[anum][nnum]) }}
+			{%- endfor -%}
+		</tr>
+	{%- endfor -%}
+	<tr>
+		<td> </td>
+		{%- for nnum in sorted(table[0].keys()) -%}
+			<td class="x_axis">
+				{%- if nnum % 5 == 0 -%}
+					{{ nnum }}
+				{%- endif %}
+			</td>
+		{%- endfor -%}
+	</tr>
+	<tr><td colspan="100" align="center">Neutron number</td></tr>
+</table>
+
+<hr>
+<b>Half-life ranges:</b>
+<table>
+
+  <tr><td class="nuclide hl1e9" style="width: 20px; height: 20px;"></td><td> &gt; 10<sup>9</sup>s</td></tr>
+  <tr><td class="nuclide hl1e6" style="width: 20px; height: 20px;"></td><td> 10<sup>6</sup> - 10<sup>9</sup>s</td></tr>
+  <tr><td class="nuclide hl1e3" style="width: 20px; height: 20px;"></td><td> 10<sup>3</sup> - 10<sup>6</sup></td></tr>
+  <tr><td class="nuclide hl1e2" style="width: 20px; height: 20px;"></td><td> 100 - 1000 s</td></tr>
+  <tr><td class="nuclide hl1e1" style="width: 20px; height: 20px;"></td><td> 10 - 100 s</td></tr>
+  <tr><td class="nuclide hl1e0" style="width: 20px; height: 20px;"></td><td> 1 - 10 s</td></tr>
+  <tr><td class="nuclide hl1e-1" style="width: 20px; height: 20px;"></td><td> 0.1 - 1 s</td></tr>
+  <tr><td class="nuclide hl1e-2" style="width: 20px; height: 20px;"></td><td> 0.01 - 0.1 s</td></tr>
+  <tr><td class="nuclide hl1e-3" style="width: 20px; height: 20px;"></td><td> 10<sup>-3</sup> - 10<sup>-2</sup> s</td></tr>
+  <tr><td class="nuclide hl1e-6" style="width: 20px; height: 20px;"></td><td> 10<sup>-6</sup> - 10<sup>-3</sup> s</td></tr>
+  <tr><td class="nuclide hl1e-9" style="width: 20px; height: 20px;"></td><td> 10<sup>-9</sup> - 10<sup>-6</sup> s</td></tr>
+  <tr><td class="nuclide hl1e-12" style="width: 20px; height: 20px;"></td><td> 10<sup>-12</sup> - 10<sup>-9</sup> s</td></tr>
+  <tr><td class="nuclide hl1e-15" style="width: 20px; height: 20px;"></td><td> 10<sup>-15</sup> - 10<sup>-12</sup> s</td></tr>
+  <tr><td class="nuclide hl1e-18" style="width: 20px; height: 20px;"></td><td> 10<sup>-18</sup> - 10<sup>-15</sup> s</td></tr>
+  <tr><td class="nuclide hl1e-21" style="width: 20px; height: 20px;"></td><td> &lt; 10<sup>-18</sup> s</td></tr>
+</table>
+
+<hr>
+<a href="/nuclide_decays">Nuclides by dominant decay mode</a> /
+<a href="/">Periodic Table</a>
+{% endblock %}

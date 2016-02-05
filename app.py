@@ -22,6 +22,7 @@ from flask import Flask, request, jsonify, render_template, send_file
 from flask.json import JSONEncoder
 
 import chemistry
+import nuclides
 
 
 class CustomJSONEncoder(JSONEncoder):
@@ -36,10 +37,14 @@ app.json_encoder = CustomJSONEncoder
 
 # May be set to chemistry.ApiElementProvider (slower, but more up-to-date)
 element_provider_class = chemistry.WdqElementProvider
+nuclide_provider_class = nuclides.SparqlNuclideProvider
 
-fake_globals = {'isinstance': isinstance}
+fake_globals = {'isinstance': isinstance, 'sorted': sorted}
 for key in ('EmptyCell', 'UnknownCell', 'ElementCell', 'IndicatorCell'):
     fake_globals[key] = getattr(chemistry, key)
+
+for key in ('NoneCell', 'NuclideCell'):
+    fake_globals[key] = getattr(nuclides, key)
 
 
 @app.before_request
@@ -51,6 +56,7 @@ def set_language():
     if not app.language:
         app.language = 'en'
     app.element_provider = element_provider_class(app.language)
+    app.nuclide_provider = nuclide_provider_class(app.language)
 
 
 @app.route('/')
@@ -58,6 +64,24 @@ def index():
     """Render the index page."""
     elements, table, special_series, incomplete = app.element_provider.get_table()
     return render_template('index.html', table=table, special_series=special_series,
+                           incomplete=incomplete, **fake_globals)
+
+
+@app.route('/nuclides')
+def nuclides():
+    """Render the chart of the nuclides."""
+    nuclides, table, incomplete = app.nuclide_provider.get_table()
+    app.nuclide_provider.decorate_by_halflife(nuclides)
+    return render_template('nuclides.html', table=table,
+                           incomplete=incomplete, **fake_globals)
+
+
+@app.route('/nuclide_decays')
+def nuclide_decays():
+    """Render the chart of the nuclides."""
+    nuclides, table, incomplete = app.nuclide_provider.get_table()
+    app.nuclide_provider.decorate_by_decay_mode(nuclides)
+    return render_template('nuclide_decays.html', table=table,
                            incomplete=incomplete, **fake_globals)
 
 
