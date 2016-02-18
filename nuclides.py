@@ -171,10 +171,14 @@ SELECT ?nuclide ?half_life ?half_life_unit WHERE {{ \
         query_result = self.get_sparql(hl_query)
         for nuclide_result in query_result:
             nuclide_uri = nuclide_result['nuclide']['value']
+            if nuclide_result['half_life']['value'] == '0':
+                continue  # WDQS bug: values sometimes zero - skip
             if nuclide_uri in nuclides:
-                nuclides[nuclide_uri].half_life = time_in_seconds(
-                    nuclide_result['half_life']['value'],
-                    nuclide_result['half_life_unit']['value'])
+                if nuclides[nuclide_uri].half_life is None:
+                    nuclides[nuclide_uri].half_life = time_in_seconds(
+                        nuclide_result['half_life']['value'],
+                        nuclide_result['half_life_unit']['value'])
+                # else - sparql returned more than 1 half-life value - problem?
 
         decay_query = "PREFIX ps: <http://www.wikidata.org/prop/statement/> \
 PREFIX pq: <http://www.wikidata.org/prop/qualifier/> \
