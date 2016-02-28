@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Copyright © 2012-2015 Ricordisamoa
+Copyright © 2012-2016 Ricordisamoa
 
 This file is part of the Wikidata periodic table.
 
@@ -197,7 +197,7 @@ class PropertyAlreadySetException(Exception):
     """Property already set."""
 
 
-class Element(object):
+class Element:
 
     props = ('number', 'symbol', 'item_id', 'label', 'period', 'group', 'special')
     symbol_pid = 246
@@ -239,7 +239,7 @@ class Element(object):
             yield (key, getattr(self, key))
 
 
-class TableCell(object):
+class TableCell:
     """A table cell."""
 
 

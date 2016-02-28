@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Copyright © 2015, 2016 ArthurPSmith
+Copyright © 2016 Ricordisamoa
 
 This file is part of the Wikidata periodic table.
 
@@ -295,7 +296,7 @@ class PropertyAlreadySetException(Exception):
     """Property already set."""
 
 
-class Nuclide(object):
+class Nuclide:
 
     props = ('atomic_number', 'neutron_number', 'item_id', 'label', 'half_life', 'decay_modes')
     atomic_number_pid = 1086
@@ -328,7 +329,7 @@ class Nuclide(object):
             yield (key, getattr(self, key))
 
 
-class TableCell(object):
+class TableCell:
     """A table cell."""
 
 

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Copyright © 2012-2015 Ricordisamoa
+Copyright © 2012-2016 Ricordisamoa
 
 This file is part of the Wikidata periodic table.
 
@@ -45,7 +45,7 @@ def get_json(url, data):
     return get_json_cached(url, urlencode(data))
 
 
-class BaseProvider(object):
+class BaseProvider:
     """Base class for all providers."""
 
     WD_API = 'http://www.wikidata.org/w/api.php'
@@ -82,7 +82,7 @@ class BaseProvider(object):
         raise NotImplementedError()
 
 
-class WdqBase(object):
+class WdqBase:
     """Load items from Wikidata Query."""
 
     WDQ_API = 'http://wdq.wmflabs.org/api'
@@ -96,7 +96,7 @@ class WdqBase(object):
         raise NotImplementedError()
 
 
-class SparqlBase(object):
+class SparqlBase:
     """Load items from Wikidata SPARQL query service."""
 
     SPARQL_API = 'https://query.wikidata.org/sparql'
