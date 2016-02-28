@@ -22,7 +22,7 @@ along with the Wikidata periodic table.  If not, see <http://www.gnu.org/license
 import operator
 from collections import defaultdict
 
-from base import BaseProvider, WdqBase, SparqlBase
+from base import BaseProvider, WdqBase, SparqlBase, PropertyAlreadySetException, TableCell
 from units import time_in_seconds_from_claim, time_in_seconds
 
 
@@ -292,10 +292,6 @@ class WdqNuclideProvider(WdqBase, NuclideProvider):
         }
 
 
-class PropertyAlreadySetException(Exception):
-    """Property already set."""
-
-
 class Nuclide:
 
     props = ('atomic_number', 'neutron_number', 'item_id', 'label', 'half_life', 'decay_modes')
@@ -327,10 +323,6 @@ class Nuclide:
     def __iter__(self):
         for key in self.props:
             yield (key, getattr(self, key))
-
-
-class TableCell:
-    """A table cell."""
 
 
 class NuclideCell(Nuclide, TableCell):

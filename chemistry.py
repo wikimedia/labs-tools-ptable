@@ -22,7 +22,7 @@ import operator
 from collections import defaultdict
 
 import data
-from base import BaseProvider, WdqBase, get_json
+from base import BaseProvider, PropertyAlreadySetException, TableCell, WdqBase, get_json
 
 
 class ElementProvider(BaseProvider):
@@ -193,10 +193,6 @@ class ApiElementProvider(ElementProvider):
         return [page['title'] for page in backlinks['query']['pages'].values()]
 
 
-class PropertyAlreadySetException(Exception):
-    """Property already set."""
-
-
 class Element:
 
     props = ('number', 'symbol', 'item_id', 'label', 'period', 'group', 'special')
@@ -237,10 +233,6 @@ class Element:
     def __iter__(self):
         for key in self.props:
             yield (key, getattr(self, key))
-
-
-class TableCell:
-    """A table cell."""
 
 
 class ElementCell(Element, TableCell):

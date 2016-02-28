@@ -45,6 +45,14 @@ def get_json(url, data):
     return get_json_cached(url, urlencode(data))
 
 
+class PropertyAlreadySetException(Exception):
+    """Property already set."""
+
+
+class TableCell:
+    """A table cell."""
+
+
 class BaseProvider:
     """Base class for all providers."""
 
