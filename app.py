@@ -69,20 +69,28 @@ def index():
 
 @app.route('/nuclides')
 def nuclides():
-    """Render the chart of the nuclides."""
+    """Render the chart of the nuclides by half-life."""
     nuclides, table, incomplete = app.nuclide_provider.get_table()
     app.nuclide_provider.decorate_by_halflife(nuclides)
-    return render_template('nuclides.html', table=table,
-                           incomplete=incomplete, **fake_globals)
+    return render_nuclides(nuclides, 'nuclides.html', incomplete)
 
 
 @app.route('/nuclide_decays')
 def nuclide_decays():
-    """Render the chart of the nuclides."""
+    """Render the chart of the nuclides by decay mode."""
     nuclides, table, incomplete = app.nuclide_provider.get_table()
     app.nuclide_provider.decorate_by_decay_mode(nuclides)
-    return render_template('nuclide_decays.html', table=table,
-                           incomplete=incomplete, **fake_globals)
+    return render_nuclides(nuclides, 'nuclide_decays.html', incomplete)
+
+
+def render_nuclides(nuclides, template_file, incomplete):
+    magic_numbers = app.nuclide_provider.get_magic_numbers()
+    max_neutrons = max(map(lambda nuclide: nuclide.neutron_number, nuclides))
+    max_protons = max(map(lambda nuclide: nuclide.atomic_number, nuclides))
+    return render_template(template_file, nuclide_list=nuclides,
+                           magic_numbers=magic_numbers, max_neutrons=max_neutrons,
+                           max_protons=max_protons, incomplete=incomplete,
+                           **fake_globals)
 
 
 @app.route('/license')

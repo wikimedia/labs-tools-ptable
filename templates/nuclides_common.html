@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{%- macro wd_url(nuclide) -%}
+	//www.wikidata.org/wiki/{{ nuclide.item_id }}
+{%- endmacro -%}
+{%- macro format_cell(nuclide) -%}
+	{%- if isinstance(nuclide, NuclideCell) -%}
+            <a xlink:href="{{ wd_url(nuclide) }}"><rect x="{{ nuclide.neutron_number }}" y="-{{ nuclide.atomic_number }}" width="1" height="1" class="nuclide {% for class in nuclide.classes %} {{ class }}{% endfor %}"><title>{{ nuclide.label }}</title></rect></a>
+	{%- endif -%}
+{%- endmacro -%}
+{% block head -%}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='nuclides.css') }}">
+<script src="//tools-static.wmflabs.org/cdnjs/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+<script src="//tools-static.wmflabs.org/cdnjs/ajax/libs/jquery.panzoom/2.0.5/jquery.panzoom.min.js"></script>
+<script src="{{ url_for('static', filename='nuclides.js') }}"></script>
+{% endblock %}
+{% block title %}
+Wikidata chart of the nuclides - Wikimedia Tool Labs
+{% endblock %}
+{% block content %}
+<h1>Wikidata chart of the nuclides</h1>
+<h2>By {% block chart_label %}{% endblock %} (stable nuclides are black)</h2>
+{% if incomplete %}
+	<h2>Incomplete</h2>
+	<table>
+		<thead>
+			<tr>
+				<th>nuclide</th>
+				<th>atomic number</th>
+				<th>neutron number</th>
+			</tr>
+		</thead>
+		<tbody>
+		{%- for nuclide in incomplete -%}
+			<tr>
+				<td><a href="{{ wd_url(nuclide) }}">{{ nuclide.label }} ({{ nuclide.item_id }})</a></td>
+				<td>{{ nuclide.atomic_number or '?' }}</td>
+				<td>{{ nuclide.neutron_number or '?' }}</td>
+			</tr>
+		{%- endfor -%}
+		</tbody>
+	</ul>
+{% endif %}
+
+<section class="buttons">
+  <button id="nuclides-zoom-in">Zoom In</button>
+  <button id="nuclides-zoom-out">Zoom Out</button>
+  <input type="range" id="nuclides-zoom-range" min="0.2" max="2" step="0.05"/>
+  <button id="nuclides-reset">Reset</button>
+</section>
+<table>
+<tr><td>
+    <svg height="600px" width="700px" viewBox="-10 -{{ max_protons + 10 }} {{ max_neutrons + 20 }} {{ max_protons + 20 }}" preserveAspectRatio="xMinYMin meet" id="nuclides">
+	{%- for magic_number in magic_numbers -%}
+	    {%- if magic_number < max_neutrons -%}
+                <line x1="{{ magic_number + 0.5 }}" y1="-{{ max_protons }}" x2="{{ magic_number + 0.5 }}" y2="0" />
+                <text transform="translate({{ magic_number }}, -{{ 2*magic_number**0.8 + 10 }})rotate(-90)">{{ magic_number }} neutrons</text>
+            {%- endif -%}
+	    {%- if magic_number < max_protons -%}
+                <line x1="0" y1="-{{ magic_number - 0.5 }}" x2="{{ max_neutrons }}" y2="-{{ magic_number - 0.5 }}" />
+                <text x="{{ magic_number *1.5 + 25 }}" y="-{{ magic_number }}">{{ magic_number }} protons</text>
+            {%- endif -%}
+        {%- endfor -%}
+	{%- for nuclide in nuclide_list -%}
+		{{ format_cell(nuclide) }}
+	{%- endfor -%}
+   </svg>
+</td><td>
+{% block legend %}{% endblock %}
+</td></tr></table>
+
+<hr>
+
+{% block links %}{% endblock %}
+
+{% endblock %}

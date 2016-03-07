@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with the Wikidata periodic table.  If not, see <http://www.gnu.org/licenses/>.
  */
-table#nuclides{
+table#nuclides {
 	border-spacing: 0;
 }
 table#nuclides td {
@@ -34,7 +34,7 @@ td.empty {
 	background: none;
 }
 
-td.nuclide{
+td.nuclide {
 	background: #e8e8e8;
 }
 
@@ -122,15 +122,15 @@ td.nuclide.neutron-emission {
 	background: #00f;
 }
 
-td.nuclide.2-neutron-emission{
+td.nuclide.two-neutron-emission {
 	background: #04c;
 }
 
-td.nuclide.3-neutron-emission {
+td.nuclide.three-neutron-emission {
 	background: #088;
 }
 
-td.nuclide.4-neutron-emission {
+td.nuclide.four-neutron-emission {
 	background: #0c4;
 }
 
@@ -150,11 +150,11 @@ td.nuclide.proton-emission {
 	background: #cf6;
 }
 
-td.nuclide.2-proton-emission {
+td.nuclide.two-proton-emission {
 	background: #ff0;
 }
 
-td.nuclide.3-proton-emission {
+td.nuclide.three-proton-emission {
 	background: #f93;
 }
 
@@ -168,4 +168,151 @@ td.nuclide.double-alpha-decay {
 
 td.nuclide.spontaneous-fission {
 	background: #f00;
+}
+
+rect.nuclide {
+	fill: #e8e8e8;
+	cursor: pointer;
+}
+
+rect.nuclide.stable {
+	fill: #000;
+}
+
+rect.nuclide.hl1e9 {
+	fill: #008;
+}
+
+rect.nuclide.hl1e6 {
+	fill: #00c;
+}
+
+rect.nuclide.hl1e3 {
+	fill: #00f;
+}
+
+rect.nuclide.hl1e2 {
+	fill: #04c;
+}
+
+rect.nuclide.hl1e1 {
+	fill: #088;
+}
+
+rect.nuclide.hl1e0 {
+	fill: #0c4;
+}
+
+rect.nuclide.hl1e-1 {
+	fill: #0f0;
+}
+
+rect.nuclide.hl1e-2 {
+	fill: #4c4;
+}
+
+rect.nuclide.hl1e-3 {
+	fill: #8f8;
+}
+
+rect.nuclide.hl1e-6 {
+	fill: #cf6;
+}
+
+rect.nuclide.hl1e-9 {
+	fill: #ff0;
+}
+
+rect.nuclide.hl1e-12 {
+	fill: #f93;
+}
+
+rect.nuclide.hl1e-15 {
+	fill: #c60;
+}
+
+rect.nuclide.hl1e-18 {
+	fill: #f60;
+}
+
+rect.nuclide.hl1e-21 {
+	fill: #f00;
+}
+
+table#nuclides rect.x_axis {
+	font-size: 5px;
+	transform: rotate(90.0deg);
+}
+table#nuclides rect.y_axis {
+	font-size: 5px;
+}
+
+rect.nuclide.beta-minus {
+	fill: #0ac;
+}
+
+rect.nuclide.double-beta {
+	fill: #00c;
+}
+
+rect.nuclide.neutron-emission {
+	fill: #00f;
+}
+
+rect.nuclide.two-neutron-emission {
+	fill: #04c;
+}
+
+rect.nuclide.three-neutron-emission {
+	fill: #088;
+}
+
+rect.nuclide.four-neutron-emission {
+	fill: #0c4;
+}
+
+rect.nuclide.positron-emission {
+	fill: #0f0;
+}
+
+rect.nuclide.electron-capture {
+	fill: #4c4;
+}
+
+rect.nuclide.double-electron-capture {
+	fill: #8f8;
+}
+
+rect.nuclide.proton-emission {
+	fill: #cf6;
+}
+
+rect.nuclide.two-proton-emission {
+	fill: #ff0;
+}
+
+rect.nuclide.three-proton-emission {
+	fill: #f93;
+}
+
+rect.nuclide.alpha-decay {
+	fill: #c60;
+}
+
+rect.nuclide.double-alpha-decay {
+	fill: #f60;
+}
+
+rect.nuclide.spontaneous-fission {
+	fill: #f00;
+}
+
+svg#nuclides line {
+	stroke: #000000;
+	stroke-width: 0.1;
+	stroke-dasharray: 2 1;
+}
+
+svg#nuclides text {
+	font-size: 4px;
 }

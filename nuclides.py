@@ -97,11 +97,11 @@ class NuclideProvider(BaseProvider):
             '179856': 'alpha-decay',
             '898923': 'neutron-emission',
             '902157': 'proton-emission',
-            '9253686': '2-proton-emission',
-            '21457313': '3-proton-emission',
-            '21456752': '2-neutron-emission',
-            '21457084': '3-neutron-emission',
-            '21457201': '4-neutron emission',
+            '9253686': 'two-proton-emission',
+            '21457313': 'three-proton-emission',
+            '21456752': 'two-neutron-emission',
+            '21457084': 'three-neutron-emission',
+            '21457201': 'four-neutron emission',
             '21457421': 'double-alpha-decay',
             '146682': 'spontaneous-fission'
         }
@@ -205,6 +205,21 @@ SELECT ?nuclide ?decay_to ?decay_mode ?fraction WHERE {{ \
         for item_id, nuclide in nuclides.items():
             yield nuclide
 
+    def get_magic_numbers(self):
+        magic_query = "PREFIX wdt: <http://www.wikidata.org/prop/direct/> \
+PREFIX wd: <http://www.wikidata.org/entity/> \
+SELECT ?magic_number WHERE {{ \
+    ?number wdt:P{0} wd:Q{1} ; \
+            wdt:P{2} ?magic_number . \
+}} ORDER by ?magic_number".format(Nuclide.instance_pid, Nuclide.magic_qid,
+                                  Nuclide.numeric_pid)
+        query_result = self.get_sparql(magic_query)
+        magic_numbers = []
+        for magic_result in query_result:
+            magic_number = magic_result['magic_number']['value']
+            magic_numbers.append(int(magic_number))
+        return magic_numbers
+
 
 class WdqNuclideProvider(WdqBase, NuclideProvider):
     """Load nuclides from Wikidata Query."""
@@ -306,6 +321,8 @@ class Nuclide:
     isotope_qid = 25276  # top-level class under which all isotopes to be found
     stable_qid = 878130  # id for stable isotope
     isomer_qid = 846110  # metastable isomers all instances of this
+    magic_qid = 11606  # magic number of nucleons for stability
+    numeric_pid = 1181
 
     def __init__(self, **kwargs):
         self.decay_modes = []
