@@ -4,6 +4,6 @@
 	"description" : "Modern Wikidata-based version of Mendeleev's periodic table",
 	"url" : "https://tools.wmflabs.org/ptable/",
 	"keywords" : "periodic table, Wikidata, chemistry",
-	"author" : "Ricordisamoa",
+	"author" : "Ricordisamoa, ArthurPSmith",
 	"repository" : "https://github.com/wikimedia/labs-tools-ptable.git"
 }
