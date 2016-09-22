@@ -56,7 +56,7 @@ class TableCell:
 class BaseProvider:
     """Base class for all providers."""
 
-    WD_API = 'http://www.wikidata.org/w/api.php'
+    WD_API = 'https://www.wikidata.org/w/api.php'
     API_LIMIT = 50
 
     def __init__(self, language):
