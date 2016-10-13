@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Copyright © 2012-2015 Ricordisamoa
+Copyright © 2012-2016 Ricordisamoa
 
 This file is part of the Wikidata periodic table.
 
@@ -36,7 +36,7 @@ app = Flask(__name__)
 app.json_encoder = CustomJSONEncoder
 
 # May be set to chemistry.ApiElementProvider (slower, but more up-to-date)
-element_provider_class = chemistry.WdqElementProvider
+element_provider_class = chemistry.SparqlElementProvider
 nuclide_provider_class = nuclides.SparqlNuclideProvider
 
 fake_globals = {'isinstance': isinstance, 'sorted': sorted}

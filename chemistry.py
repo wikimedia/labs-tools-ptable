@@ -22,7 +22,7 @@ import operator
 from collections import defaultdict
 
 import data
-from base import BaseProvider, PropertyAlreadySetException, TableCell, WdqBase, get_json
+from base import BaseProvider, PropertyAlreadySetException, SparqlBase, TableCell, WdqBase, get_json
 
 
 class ElementProvider(BaseProvider):
@@ -131,6 +131,52 @@ class WdqElementProvider(WdqBase, ElementProvider):
             'q': 'claim[%d]' % Element.symbol_pid,
             'props': ','.join(pids)
         }
+
+
+class SparqlElementProvider(SparqlBase, ElementProvider):
+    """Load elements from Wikidata Sparql endpoint."""
+    def __iter__(self):
+        query = 'SELECT ?item ?symbol ?number (group_concat(?subclass_of) as ?subclass_of) \
+WHERE {{ \
+    ?item wdt:P{symbol_pid} ?symbol . \
+    OPTIONAL {{ \
+        ?item wdt:P{subclass_pid} ?subclass_of \
+    }} \
+    OPTIONAL {{ \
+        ?item wdt:P{number_pid} ?number \
+    }} \
+}} \
+GROUP BY ?item ?symbol ?number'.format(symbol_pid=Element.symbol_pid,
+                                       subclass_pid=Element.subclass_pid,
+                                       number_pid=Element.number_pid)
+        items = self.get_sparql(query)
+        ids = [item['item']['value'].replace('http://www.wikidata.org/entity/', '')
+               for item in items]
+        entities = self.get_entities(ids, props='labels',
+                                     languages=self.language, languagefallback=1)
+        for item in items:
+            element = Element()
+            element.item_id = item['item']['value'].replace('http://www.wikidata.org/entity/', '')
+            if 'number' in item and item['number']['value'].isdigit():
+                element.number = int(item['number']['value'])
+            else:
+                element.number = None
+            if 'symbol' in item:
+                element.symbol = item['symbol']['value']
+            else:
+                element.symbol = None
+            if 'subclass_of' in item:
+                subclass_of = [int(subclass_id.replace('http://www.wikidata.org/entity/Q', ''))
+                               for subclass_id in item['subclass_of']['value'].split()]
+            else:
+                subclass_of = []
+            element.load_data_from_superclasses(subclass_of)
+            label = None
+            entity = entities.get(element.item_id)
+            if entity and 'labels' in entity and len(entity['labels']) == 1:
+                label = list(entity['labels'].values())[0]['value']
+            element.label = label
+            yield element
 
 
 class ApiElementProvider(ElementProvider):
