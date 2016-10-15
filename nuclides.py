@@ -117,10 +117,7 @@ class SparqlNuclideProvider(SparqlBase, NuclideProvider):
     """Load nuclide info from Wikidata Sparql endpoint."""
     def __iter__(self):
         nuclides = defaultdict(Nuclide)
-        nuclides_query = "PREFIX wdt: <http://www.wikidata.org/prop/direct/> \
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \
-PREFIX wd: <http://www.wikidata.org/entity/> \
-SELECT ?nuclide ?atomic_number ?neutron_number ?label WHERE {{ \
+        nuclides_query = "SELECT ?nuclide ?atomic_number ?neutron_number ?label WHERE {{ \
     ?nuclide wdt:P{0}/wdt:P{1}* wd:Q{2} ; \
              wdt:P{3} ?atomic_number ; \
              wdt:P{4} ?neutron_number ; \
@@ -142,9 +139,7 @@ SELECT ?nuclide ?atomic_number ?neutron_number ?label WHERE {{ \
             nuclides[nuclide_uri].half_life = None
             nuclides[nuclide_uri].item_id = nuclide_uri.split('/')[-1]
 
-        stable_query = "PREFIX wdt: <http://www.wikidata.org/prop/direct/> \
-PREFIX wd: <http://www.wikidata.org/entity/> \
-SELECT ?nuclide WHERE {{ \
+        stable_query = "SELECT ?nuclide WHERE {{ \
     ?nuclide wdt:P{0}/wdt:P{1}* wd:Q{2} ; \
              wdt:P{0} wd:Q{3} . \
 }}".format(Nuclide.instance_pid, Nuclide.subclass_pid, Nuclide.isotope_qid,
@@ -155,12 +150,7 @@ SELECT ?nuclide WHERE {{ \
             if nuclide_uri in nuclides:
                 nuclides[nuclide_uri].classes.append('stable')
 
-        hl_query = "PREFIX wdt: <http://www.wikidata.org/prop/direct/> \
-PREFIX wd: <http://www.wikidata.org/entity/> \
-PREFIX wikibase: <http://wikiba.se/ontology#> \
-PREFIX psv: <http://www.wikidata.org/prop/statement/value/> \
-PREFIX p: <http://www.wikidata.org/prop/> \
-SELECT ?nuclide ?half_life ?half_life_unit WHERE {{ \
+        hl_query = "SELECT ?nuclide ?half_life ?half_life_unit WHERE {{ \
     ?nuclide wdt:P{0}/wdt:P{1}* wd:Q{2} ; \
              p:P{3} ?hl_statement . \
     ?hl_statement psv:P{3} ?hl_value . \
@@ -181,12 +171,7 @@ SELECT ?nuclide ?half_life ?half_life_unit WHERE {{ \
                         nuclide_result['half_life_unit']['value'])
                 # else - sparql returned more than 1 half-life value - problem?
 
-        decay_query = "PREFIX ps: <http://www.wikidata.org/prop/statement/> \
-PREFIX pq: <http://www.wikidata.org/prop/qualifier/> \
-PREFIX p: <http://www.wikidata.org/prop/> \
-PREFIX wdt: <http://www.wikidata.org/prop/direct/> \
-PREFIX wd: <http://www.wikidata.org/entity/> \
-SELECT ?nuclide ?decay_to ?decay_mode ?fraction WHERE {{ \
+        decay_query = "SELECT ?nuclide ?decay_to ?decay_mode ?fraction WHERE {{ \
     ?nuclide wdt:P{0}/wdt:P{1}* wd:Q{2} ; \
              p:P{3} ?decay_statement . \
     ?decay_statement ps:P{3} ?decay_to ; \
@@ -206,9 +191,7 @@ SELECT ?nuclide ?decay_to ?decay_mode ?fraction WHERE {{ \
             yield nuclide
 
     def get_magic_numbers(self):
-        magic_query = "PREFIX wdt: <http://www.wikidata.org/prop/direct/> \
-PREFIX wd: <http://www.wikidata.org/entity/> \
-SELECT ?magic_number WHERE {{ \
+        magic_query = "SELECT ?magic_number WHERE {{ \
     ?number wdt:P{0} wd:Q{1} ; \
             wdt:P{2} ?magic_number . \
 }} ORDER by ?magic_number".format(Nuclide.instance_pid, Nuclide.magic_qid,
