@@ -22,7 +22,7 @@ import operator
 from collections import defaultdict
 
 import data
-from base import BaseProvider, PropertyAlreadySetException, SparqlBase, TableCell, WdqBase, get_json
+from base import BaseProvider, PropertyAlreadySetException, SparqlBase, TableCell, get_json
 
 
 class ElementProvider(BaseProvider):
@@ -82,55 +82,6 @@ class ElementProvider(BaseProvider):
                     specials[period][i].__class__ = ElementCell  # XXX
                     special_series[sindex].append(specials[period][i])
         return elements, table, special_series, incomplete
-
-
-class WdqElementProvider(WdqBase, ElementProvider):
-    """Load elements from Wikidata Query."""
-    def __iter__(self):
-        wdq = self.get_wdq()
-        ids = ['Q%d' % item_id for item_id in wdq['items']]
-        entities = self.get_entities(ids, props='labels',
-                                     languages=self.language, languagefallback=1)
-        elements = defaultdict(Element)
-        subclass_of = defaultdict(list)
-        wdq['props'] = defaultdict(list, wdq.get('props', {}))
-        for item_id, datatype, value in wdq['props'][str(Element.number_pid)]:
-            if datatype != 'quantity':
-                continue
-            value = value.split('|')
-            if len(value) == 4:
-                value = list(map(float, value))
-                if len(set(value[:3])) == 1 and value[3] == 1 and value[0] == int(value[0]):
-                    elements[item_id].number = int(value[0])
-        for item_id, datatype, value in wdq['props'][str(Element.symbol_pid)]:
-            if datatype != 'string':
-                continue
-            elements[item_id].symbol = value
-        for item_id, datatype, value in wdq['props'][str(Element.subclass_pid)]:
-            if datatype != 'item':
-                continue
-            subclass_of[item_id].append(value)
-        for item_id, element in elements.items():
-            element.item_id = 'Q%d' % item_id
-            for prop in ('number', 'symbol'):
-                if not hasattr(element, prop):
-                    setattr(element, prop, None)
-            element.load_data_from_superclasses(subclass_of[item_id])
-            label = None
-            entity = entities.get(element.item_id)
-            if entity and 'labels' in entity and len(entity['labels']) == 1:
-                label = list(entity['labels'].values())[0]['value']
-            element.label = label
-            yield element
-
-    @classmethod
-    def get_query(cls):
-        pids = [str(getattr(Element, name))
-                for name in ('symbol_pid', 'subclass_pid', 'number_pid')]
-        return {
-            'q': 'claim[%d]' % Element.symbol_pid,
-            'props': ','.join(pids)
-        }
 
 
 class SparqlElementProvider(SparqlBase, ElementProvider):

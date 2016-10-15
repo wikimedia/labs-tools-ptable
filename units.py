@@ -37,15 +37,6 @@ time_units = {
 }
 
 
-def time_in_seconds_from_claim(claim):
-    amount = None
-    if 'mainsnak' in claim:
-        if 'datavalue' in claim['mainsnak']:
-            quantity = claim['mainsnak']['datavalue']['value']
-            amount = time_in_seconds(quantity['amount'], quantity['unit'])
-    return amount
-
-
 def time_in_seconds(amount_str, unit_uri):
     amount = float(amount_str)
     unit_id = int(unit_uri.split('/')[-1].replace('Q', ''))

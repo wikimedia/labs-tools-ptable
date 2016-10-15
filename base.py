@@ -90,20 +90,6 @@ class BaseProvider:
         raise NotImplementedError()
 
 
-class WdqBase:
-    """Load items from Wikidata Query."""
-
-    WDQ_API = 'http://wdq.wmflabs.org/api'
-
-    @classmethod
-    def get_wdq(cls):
-        return get_json(cls.WDQ_API, cls.get_query())
-
-    @classmethod
-    def get_query(cls):
-        raise NotImplementedError()
-
-
 class SparqlBase:
     """Load items from Wikidata SPARQL query service."""
 

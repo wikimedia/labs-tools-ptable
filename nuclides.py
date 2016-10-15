@@ -22,8 +22,8 @@ along with the Wikidata periodic table.  If not, see <http://www.gnu.org/license
 import operator
 from collections import defaultdict
 
-from base import BaseProvider, WdqBase, SparqlBase, PropertyAlreadySetException, TableCell
-from units import time_in_seconds_from_claim, time_in_seconds
+from base import BaseProvider, SparqlBase, PropertyAlreadySetException, TableCell
+from units import time_in_seconds
 
 
 class NuclideProvider(BaseProvider):
@@ -219,92 +219,6 @@ SELECT ?magic_number WHERE {{ \
             magic_number = magic_result['magic_number']['value']
             magic_numbers.append(int(magic_number))
         return magic_numbers
-
-
-class WdqNuclideProvider(WdqBase, NuclideProvider):
-    """Load nuclides from Wikidata Query."""
-    def __iter__(self):
-        wdq = self.get_wdq()
-        ids = ['Q%d' % item_id for item_id in wdq['items']]
-        entities = self.get_entities(ids, props='labels|claims',
-                                     languages=self.language, languagefallback=1)
-        nuclides = defaultdict(Nuclide)
-        wdq['props'] = defaultdict(list, wdq.get('props', {}))
-        for item_id, datatype, value in wdq['props'][str(Nuclide.atomic_number_pid)]:
-            if datatype != 'quantity':
-                continue
-            value = value.split('|')
-            if len(value) == 4:
-                value = list(map(float, value))
-                if len(set(value[:3])) == 1 and value[3] == 1 and value[0] == int(value[0]):
-                    nuclides[item_id].atomic_number = int(value[0])
-        for item_id, datatype, value in wdq['props'][str(Nuclide.neutron_number_pid)]:
-            if datatype != 'quantity':
-                continue
-            value = value.split('|')
-            if len(value) == 4:
-                value = list(map(float, value))
-                if len(set(value[:3])) == 1 and value[3] == 1 and value[0] == int(value[0]):
-                    nuclides[item_id].neutron_number = int(value[0])
-        for item_id, nuclide in nuclides.items():
-            nuclide.item_id = 'Q%d' % item_id
-            for prop in ('atomic_number', 'neutron_number'):
-                if not hasattr(nuclide, prop):
-                    setattr(nuclide, prop, None)
-# ??            nuclide.load_data_from_superclasses(subclass_of[item_id])
-            label = None
-            entity = entities.get(nuclide.item_id)
-            if entity and 'labels' in entity and len(entity['labels']) == 1:
-                label = list(entity['labels'].values())[0]['value']
-            nuclide.label = label
-
-            if entity:
-                claims = entity['claims']
-                instance_prop = 'P%d' % Nuclide.instance_pid
-                if instance_prop in claims:
-                    instance_claims = claims[instance_prop]
-                    for instance_claim in instance_claims:
-                        class_id = instance_claim['mainsnak']['datavalue']['value']['numeric-id']
-                        if class_id == Nuclide.stable_qid:
-                            nuclide.classes.append('stable')
-
-            half_life = None
-            if entity:
-                claims = entity['claims']
-                hlprop = 'P%d' % Nuclide.half_life_pid
-                if hlprop in claims:
-                    hl_claims = claims[hlprop]
-                    for hl_claim in hl_claims:
-                        half_life = time_in_seconds_from_claim(hl_claim)
-            nuclide.half_life = half_life
-
-            if entity:
-                claims = entity['claims']
-                decay_prop = 'P%d' % Nuclide.decays_to_pid
-                if decay_prop in claims:
-                    decay_claims = claims[decay_prop]
-                    for decay_claim in decay_claims:
-                        if 'qualifiers' in decay_claim:
-                            decay_mode_prop = 'P%d' % Nuclide.decay_mode_pid
-                            qualifiers = decay_claim['qualifiers']
-                            if decay_mode_prop in qualifiers:
-                                for qualifier in qualifiers[decay_mode_prop]:
-                                    nuclide.decay_modes.append(
-                                        qualifier['datavalue']['value']['numeric-id'])
-
-            yield nuclide
-
-    @classmethod
-    def get_query(cls):
-        pids = [str(getattr(Nuclide, name))
-                for name in ('atomic_number_pid', 'neutron_number_pid')]
-        return {
-            'q': 'claim[%d:(tree[%d][][%d])] AND noclaim[%d:%d]' %
-                 (Nuclide.instance_pid, Nuclide.isotope_qid,
-                  Nuclide.subclass_pid, Nuclide.instance_pid,
-                  Nuclide.isomer_qid),
-            'props': ','.join(pids)
-        }
 
 
 class Nuclide:
