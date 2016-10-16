@@ -39,7 +39,7 @@ app.json_encoder = CustomJSONEncoder
 element_provider_class = chemistry.SparqlElementProvider
 nuclide_provider_class = nuclides.SparqlNuclideProvider
 
-fake_globals = {'isinstance': isinstance, 'sorted': sorted}
+fake_globals = {'isinstance': isinstance}
 for key in ('EmptyCell', 'UnknownCell', 'ElementCell', 'IndicatorCell'):
     fake_globals[key] = getattr(chemistry, key)
 
