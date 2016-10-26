@@ -26,23 +26,20 @@ from cachetools import ttl_cache
 
 
 @ttl_cache(maxsize=200, ttl=21600)
-def get_json_cached(url, data):
+def get_json_cached(url, data, get):
     """The information is cached for 6 hours."""
-    with urlopen(url, data.encode('utf-8')) as response:
+    if get:
+        params = ['{0}?{1}'.format(url, data)]
+    else:
+        params = [url, data.encode('utf-8')]
+    with urlopen(*params) as response:
         raw = response.read()
     return json.loads(raw.decode('utf-8'))
 
 
-@ttl_cache(maxsize=50, ttl=21600)
-def get_json_with_get(url, url_encoded_params):
-    """Get rather than Post request - information is cached for 6 hours."""
-    with urlopen("{0}?{1}".format(url, url_encoded_params)) as response:
-        raw = response.read()
-    return json.loads(raw.decode('utf-8'))
-
-
-def get_json(url, data):
-    return get_json_cached(url, urlencode(data))
+def get_json(url, data, get=False):
+    """Wrapper for get_json_cached() with URL encoding."""
+    return get_json_cached(url, urlencode(data), get)
 
 
 class PropertyAlreadySetException(Exception):
@@ -97,5 +94,5 @@ class SparqlBase:
 
     @classmethod
     def get_sparql(cls, query):
-        response = get_json_with_get(cls.SPARQL_API, urlencode({'query': query, 'format': 'json'}))
+        response = get_json(cls.SPARQL_API, {'query': query, 'format': 'json'}, get=True)
         return response['results']['bindings']
