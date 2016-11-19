@@ -22,7 +22,7 @@ import json
 from urllib.parse import urlencode
 from urllib.request import urlopen
 
-from cachetools import ttl_cache
+from cachetools.func import ttl_cache
 
 
 @ttl_cache(maxsize=200, ttl=21600)
