@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Copyright © 2015, 2016 ArthurPSmith
-Copyright © 2016 Ricordisamoa
+Copyright © 2016-2017 Ricordisamoa
 
 This file is part of the Wikidata periodic table.
 
@@ -117,16 +117,17 @@ class SparqlNuclideProvider(SparqlBase, NuclideProvider):
     """Load nuclide info from Wikidata Sparql endpoint."""
     def __iter__(self):
         nuclides = defaultdict(Nuclide)
-        nuclides_query = "SELECT ?nuclide ?atomic_number ?neutron_number ?label WHERE {{ \
+        nuclides_query = "SELECT ?nuclide ?atomic_number ?neutron_number ?stable ?label WHERE {{ \
     ?nuclide wdt:P{0}/wdt:P{1}* wd:Q{2} ; \
              wdt:P{3} ?atomic_number ; \
              wdt:P{4} ?neutron_number ; \
              rdfs:label ?label ; \
     FILTER NOT EXISTS {{ ?nuclide wdt:P{0} wd:Q{5} . }} \
     FILTER(lang(?label) = 'en') \
+    BIND( EXISTS {{ ?nuclide wdt:P{0} wd:Q{6} . }} AS ?stable ) \
 }}".format(Nuclide.instance_pid, Nuclide.subclass_pid, Nuclide.isotope_qid,
             Nuclide.atomic_number_pid, Nuclide.neutron_number_pid,
-            Nuclide.isomer_qid)
+            Nuclide.isomer_qid, Nuclide.stable_qid)
         query_result = self.get_sparql(nuclides_query)
         for nuclide_result in query_result:
             nuclide_uri = nuclide_result['nuclide']['value']
@@ -138,16 +139,7 @@ class SparqlNuclideProvider(SparqlBase, NuclideProvider):
             nuclides[nuclide_uri].label = label
             nuclides[nuclide_uri].half_life = None
             nuclides[nuclide_uri].item_id = nuclide_uri.split('/')[-1]
-
-        stable_query = "SELECT ?nuclide WHERE {{ \
-    ?nuclide wdt:P{0}/wdt:P{1}* wd:Q{2} ; \
-             wdt:P{0} wd:Q{3} . \
-}}".format(Nuclide.instance_pid, Nuclide.subclass_pid, Nuclide.isotope_qid,
-            Nuclide.stable_qid)
-        query_result = self.get_sparql(stable_query)
-        for nuclide_result in query_result:
-            nuclide_uri = nuclide_result['nuclide']['value']
-            if nuclide_uri in nuclides:
+            if nuclide_result['stable']['value'] == 'true':
                 nuclides[nuclide_uri].classes.append('stable')
 
         hl_query = "SELECT ?nuclide ?half_life ?half_life_unit WHERE {{ \
