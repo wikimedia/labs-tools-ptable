@@ -32,7 +32,7 @@ periods = [
     986218
 ]
 groups = [
-    19557,
+    29366681,
     19563,
     108307,
     189302,
@@ -59,6 +59,7 @@ special_series = [
 ]
 
 special_subclasses = {
+    19557: 'alkali-metal',
     19591: 'post-transition-metal',
     19596: 'metalloid',
     19753344: 'diatomic-nonmetal',

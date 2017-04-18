@@ -53,7 +53,7 @@ table#period .element {
 }
 
 /* alkali metals */
-table#period .element.group-1 {
+table#period .element.alkali-metal {
 	background: #f66;
 }
 
