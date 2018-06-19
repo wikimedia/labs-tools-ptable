@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Copyright © 2015, 2016 ArthurPSmith
+Copyright © 2015, 2016, 2018 ArthurPSmith
 Copyright © 2016-2017 Ricordisamoa
 
 This file is part of the Wikidata periodic table.
@@ -23,7 +23,6 @@ import operator
 from collections import defaultdict
 
 from base import BaseProvider, SparqlBase, PropertyAlreadySetException, TableCell
-from units import time_in_seconds
 
 
 class NuclideProvider(BaseProvider):
@@ -142,14 +141,17 @@ class SparqlNuclideProvider(SparqlBase, NuclideProvider):
             if nuclide_result['stable']['value'] == 'true':
                 nuclides[nuclide_uri].classes.append('stable')
 
-        hl_query = "SELECT ?nuclide ?half_life ?half_life_unit WHERE {{ \
+        hl_query = "SELECT ?nuclide ?half_life ?unit_factor WHERE {{ \
     ?nuclide wdt:P{0}/wdt:P{1}* wd:Q{2} ; \
              p:P{3} ?hl_statement . \
     ?hl_statement psv:P{3} ?hl_value . \
     ?hl_value wikibase:quantityAmount ?half_life ; \
               wikibase:quantityUnit ?half_life_unit . \
+    ?half_life_unit p:P{4} ?unit_conv_statement . \
+    ?unit_conv_statement psv:P{4} ?unit_conv_value . \
+    ?unit_conv_value wikibase:quantityAmount ?unit_factor . \
 }}".format(Nuclide.instance_pid, Nuclide.subclass_pid, Nuclide.isotope_qid,
-            Nuclide.half_life_pid)
+            Nuclide.half_life_pid, Nuclide.conv_to_si_pid)
 
         query_result = self.get_sparql(hl_query)
         for nuclide_result in query_result:
@@ -158,9 +160,9 @@ class SparqlNuclideProvider(SparqlBase, NuclideProvider):
                 continue  # WDQS bug: values sometimes zero - skip
             if nuclide_uri in nuclides:
                 if nuclides[nuclide_uri].half_life is None:
-                    nuclides[nuclide_uri].half_life = time_in_seconds(
-                        nuclide_result['half_life']['value'],
-                        nuclide_result['half_life_unit']['value'])
+                    nuclides[nuclide_uri].half_life = (
+                        float(nuclide_result['half_life']['value']) *
+                        float(nuclide_result['unit_factor']['value']))
                 # else - sparql returned more than 1 half-life value - problem?
 
         decay_query = "SELECT ?nuclide ?decay_to ?decay_mode ?fraction WHERE {{ \
@@ -212,6 +214,7 @@ class Nuclide:
     isomer_qid = 846110  # metastable isomers all instances of this
     magic_qid = 11606  # magic number of nucleons for stability
     numeric_pid = 1181
+    conv_to_si_pid = 2370  # property for unit conversion to SI (seconds)
 
     def __init__(self, **kwargs):
         self.decay_modes = []
