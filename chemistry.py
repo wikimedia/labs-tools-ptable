@@ -33,7 +33,7 @@ class ElementProvider(BaseProvider):
         specials = {}
         elements = []
         incomplete = []
-        for element in self.iter_good():
+        for element in iter(self):
             if element.symbol and element.number and element.period:
                 if element.group:
                     if element.period not in table:
@@ -81,17 +81,26 @@ class ElementProvider(BaseProvider):
                 for i in sorted(specials[period].keys()):
                     specials[period][i].__class__ = ElementCell  # XXX
                     special_series[sindex].append(specials[period][i])
-        return elements, table, special_series, incomplete
+
+        sorted_table = {}
+        for p in sorted(table.keys()):
+            row = table[p]
+            sorted_row = {}
+            for g in sorted(row.keys()):
+                sorted_row[g] = row[g]
+            sorted_table[p] = sorted_row
+
+        return elements, sorted_table, special_series, incomplete
 
 
 class SparqlElementProvider(SparqlBase, ElementProvider):
     """Load elements from Wikidata Sparql endpoint."""
     def __iter__(self):
-        query = 'SELECT ?item ?symbol ?number (group_concat(?subclass_of) as ?subclass_of) \
+        query = 'SELECT ?item ?symbol ?number (group_concat(?subclass_of) as ?subclasses_of) \
 WHERE {{ \
-    ?item wdt:P{symbol_pid} ?symbol . \
+    ?item wdt:P{instance_pid} wd:Q{element_qid} ; wdt:P{symbol_pid} ?symbol . \
     OPTIONAL {{ \
-        ?item wdt:P{subclass_pid} ?subclass_of \
+        ?item wdt:P{partof_pid}|wdt:P{subclass_pid} ?subclass_of \
     }} \
     OPTIONAL {{ \
         ?item wdt:P{number_pid} ?number \
@@ -99,7 +108,10 @@ WHERE {{ \
 }} \
 GROUP BY ?item ?symbol ?number'.format(symbol_pid=Element.symbol_pid,
                                        subclass_pid=Element.subclass_pid,
-                                       number_pid=Element.number_pid)
+                                       partof_pid=Element.partof_pid,
+                                       number_pid=Element.number_pid,
+                                       instance_pid=Element.instance_pid,
+                                       element_qid=Element.element_qid)
         items = self.get_sparql(query)
         ids = [item['item']['value'].replace('http://www.wikidata.org/entity/', '')
                for item in items]
@@ -116,9 +128,9 @@ GROUP BY ?item ?symbol ?number'.format(symbol_pid=Element.symbol_pid,
                 element.symbol = item['symbol']['value']
             else:
                 element.symbol = None
-            if 'subclass_of' in item:
+            if 'subclasses_of' in item:
                 subclass_of = [int(subclass_id.replace('http://www.wikidata.org/entity/Q', ''))
-                               for subclass_id in item['subclass_of']['value'].split()]
+                               for subclass_id in item['subclasses_of']['value'].split()]
             else:
                 subclass_of = []
             element.load_data_from_superclasses(subclass_of)
@@ -193,8 +205,11 @@ class ApiElementProvider(ElementProvider):
 class Element:
 
     props = ('number', 'symbol', 'item_id', 'label', 'period', 'group', 'special')
+    instance_pid = 31
+    element_qid = 11344
     symbol_pid = 246
     subclass_pid = 279
+    partof_pid = 361
     discovery_pid = 575
     number_pid = 1086
 

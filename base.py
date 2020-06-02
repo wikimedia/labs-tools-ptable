@@ -75,14 +75,6 @@ class BaseProvider:
             entities.update(new_entities)
         return entities
 
-    def iter_good(self):
-        iterator = iter(self)
-        while True:
-            try:
-                yield next(iterator)
-            except StopIteration:
-                raise
-
     def get_table(self):
         raise NotImplementedError()
 

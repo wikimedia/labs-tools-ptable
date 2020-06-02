@@ -34,7 +34,7 @@ class NuclideProvider(BaseProvider):
         incomplete = []
         lastanum = -1
         lastnnum = -1
-        for nuclide in self.iter_good():
+        for nuclide in iter(self):
             if nuclide.atomic_number is not None and nuclide.neutron_number is not None:
                 if nuclide.atomic_number > lastanum:
                     lastanum = nuclide.atomic_number
